@@ -48,6 +48,7 @@ export interface DiskottoActions {
   cancelScan: () => void;
   resetScan: () => void;
   addNodes: (nodes: FileSystemNode[]) => void;
+  setRootNode: (node: FileSystemNode) => void;
   setScanStatus: (status: ScanStatus) => void;
   setScanStats: (stats: ScanStats) => void;
   addScanError: (error: ScanError) => void;

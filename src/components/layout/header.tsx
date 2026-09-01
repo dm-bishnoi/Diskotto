@@ -1,57 +1,111 @@
 "use client";
 
-import { HardDrive, Search, Settings, Sun, Moon, Monitor } from "lucide-react";
+import * as React from "react";
+import { HardDrive, Settings, Sun, Moon, Monitor, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SearchBar } from "@/components/search/search-bar";
+import { ScanButton } from "@/components/scan/scan-button";
 import { useDiskottoStore } from "@/store";
+import { searchService } from "@/lib/search-index";
+import type { SearchResult } from "@/types/filesystem";
+
+interface HeaderProps {
+  onSelectFolder?: () => void;
+  onMenuClick?: () => void;
+}
 
 /**
  * Header — Top navigation bar with global controls.
  * From SPEC.md: Header component
- *
- * Phase 1 establishes the layout and theme toggle.
- * Scan button and search are wired to the store (real functionality in Phase 4/5).
  */
-export function Header() {
-  const { theme, toggleTheme, scanStatus } = useDiskottoStore();
+export function Header({ onSelectFolder, onMenuClick }: HeaderProps) {
+  const { theme, toggleTheme, scanStatus, searchQuery, setSearchResults } = useDiskottoStore();
 
   const ThemeIcon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
 
+  // Compute search results on query change (mocked against pre-loaded index)
+  const [results, setResults] = React.useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      const found = searchService.search(searchQuery);
+      setResults(found);
+      setSearchResults(found);
+      setIsSearching(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, setSearchResults]);
+
+  const handleResultSelect = (result: SearchResult) => {
+    if (result.node.type === "folder") {
+      // Navigate to the folder
+      // Phase 2: just select for now, drill-down in Phase 4
+    }
+  };
+
   return (
     <header className="h-14 shrink-0 border-b border-border bg-surface flex items-center px-md gap-sm">
-      {/* Logo */}
-      <div className="flex items-center gap-2 font-semibold text-h4 text-text-primary">
-        <HardDrive className="w-5 h-5 text-primary" />
-        <span>Diskotto</span>
-      </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Search placeholder — full search lands in Phase 5 */}
-      <div className="hidden md:flex items-center gap-2 text-body-sm text-text-muted">
-        <Search className="w-4 h-4" />
-        <span>Search files...</span>
-        <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border bg-surface-elevated px-1.5 font-mono text-[10px] font-medium">
-          <span>/</span>
-        </kbd>
-      </div>
-
-      {/* Scan button — Phase 4 implements real scan */}
+      {/* Mobile menu */}
       <Button
-        variant={scanStatus === "scanning" ? "outline" : "default"}
-        size="sm"
-        disabled={scanStatus === "scanning"}
+        variant="ghost"
+        size="icon"
+        onClick={onMenuClick}
+        className="md:hidden shrink-0"
+        aria-label="Open menu"
       >
-        {scanStatus === "scanning" ? "Scanning..." : "Select Folder"}
+        <Menu className="w-5 h-5" />
       </Button>
 
+      {/* Logo */}
+      <div className="flex items-center gap-2 font-semibold text-h4 text-text-primary shrink-0">
+        <HardDrive className="w-5 h-5 text-primary" aria-hidden="true" />
+        <span className="hidden sm:inline">Diskotto</span>
+      </div>
+
+      {/* Search */}
+      <div className="flex-1 min-w-0 flex justify-center px-2">
+        <SearchBar
+          results={results}
+          isSearching={isSearching}
+          onResultSelect={handleResultSelect}
+          className="w-full"
+        />
+      </div>
+
+      {/* Scan button */}
+      <ScanButton
+        onSelectFolder={onSelectFolder}
+        isScanning={scanStatus === "scanning"}
+        className="shrink-0"
+      />
+
       {/* Theme toggle */}
-      <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+        className="shrink-0"
+      >
         <ThemeIcon className="w-5 h-5" />
       </Button>
 
-      {/* Settings placeholder — Phase 2+ */}
-      <Button variant="ghost" size="icon" aria-label="Settings">
+      {/* Settings placeholder */}
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Settings"
+        className="shrink-0"
+      >
         <Settings className="w-5 h-5" />
       </Button>
     </header>

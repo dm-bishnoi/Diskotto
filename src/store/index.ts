@@ -42,6 +42,9 @@ export const useDiskottoStore = createStore();
 // Re-export slices for external use
 export type { ScanSlice, NavigationSlice, SearchSlice, UISlice };
 
+// Re-export scan slice actions for convenience
+export { createScanSlice } from "./scan-slice";
+
 /**
  * Selector: get the root node from the store.
  */

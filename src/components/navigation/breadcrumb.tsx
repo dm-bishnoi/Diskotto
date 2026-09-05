@@ -14,15 +14,16 @@ export function Breadcrumb() {
   const [copied, setCopied] = React.useState(false);
 
   // Build the full breadcrumb chain from root to current
-  const pathNodes = React.useMemo(() => {
-    if (!rootId) return [];
-    const chain = [nodes[rootId]];
-    for (const id of currentPath) {
-      const node = nodes[id];
-      if (node) chain.push(node);
-    }
-    return chain.filter(Boolean);
-  }, [nodes, rootId, currentPath]);
+    // Build breadcrumb chain from root to current.
+    const pathNodes = React.useMemo(() => {
+      const chain: typeof nodes[keyof typeof nodes][] = [];
+      if (rootId) chain.push(nodes[rootId]);
+      currentPath.forEach(id => {
+        const node = nodes[id];
+        if (node) chain.push(node);
+      });
+      return chain;
+    }, [nodes, rootId, currentPath]);
 
   const fullPath = pathNodes.map((n) => n.path).join("\\").replace(/^\\+|\\+$/g, "") || "C:\\";
 

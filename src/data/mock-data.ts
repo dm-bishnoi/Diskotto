@@ -86,7 +86,7 @@ function createFolder(
 }
 
 // Build the C:\ structure
-function buildDownloadsFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildDownloadsFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const downloadsFiles: FileSystemNode[] = [
     createFile("GTA_V_Final_4K.mp4", 78_400_000_000, "", parentPath, new Date("2026-08-28")),
     createFile("Project_Backup_2026.zip", 11_000_000_000, "", parentPath, new Date("2026-08-15")),
@@ -110,10 +110,13 @@ function buildDownloadsFolder(parentId: string, parentPath: string): FileSystemN
     createFile("ebook_programming.pdf", 15_000_000, "", parentPath, new Date("2026-02-14")),
   ];
 
-  return createFolder("Downloads", parentId, parentPath, downloadsFiles, new Date("2026-08-28"));
+  const downloadsFolder = createFolder("Downloads", parentId, parentPath, downloadsFiles, new Date("2026-08-28"));
+  allNodes.push({ ...downloadsFolder });
+  downloadsFiles.forEach(file => allNodes.push({ ...file }));
+  return downloadsFolder;
 }
 
-function buildDocumentsFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildDocumentsFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const documentsFiles: FileSystemNode[] = [
     createFile("tax_returns_2025.pdf", 8_500_000, "", parentPath, new Date("2026-02-28")),
     createFile("tax_returns_2024.pdf", 7_200_000, "", parentPath, new Date("2025-02-25")),
@@ -134,10 +137,13 @@ function buildDocumentsFolder(parentId: string, parentPath: string): FileSystemN
     createFile("software_license.txt", 12_000, "", parentPath, new Date("2024-05-01")),
   ];
 
-  return createFolder("Documents", parentId, parentPath, documentsFiles, new Date("2026-08-30"));
+  const documentsFolder = createFolder("Documents", parentId, parentPath, documentsFiles, new Date("2026-08-30"));
+  allNodes.push({ ...documentsFolder });
+  documentsFiles.forEach(file => allNodes.push({ ...file }));
+  return documentsFolder;
 }
 
-function buildPicturesFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildPicturesFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const picturesFiles: FileSystemNode[] = [
     createFile("vacation_2026_001.jpg", 8_400_000, "", parentPath, new Date("2026-07-15")),
     createFile("vacation_2026_002.jpg", 9_200_000, "", parentPath, new Date("2026-07-15")),
@@ -161,10 +167,13 @@ function buildPicturesFolder(parentId: string, parentPath: string): FileSystemNo
     createFile("diagram_network.png", 180_000, "", parentPath, new Date("2026-08-12")),
   ];
 
-  return createFolder("Pictures", parentId, parentPath, picturesFiles, new Date("2026-08-30"));
+  const picturesFolder = createFolder("Pictures", parentId, parentPath, picturesFiles, new Date("2026-08-30"));
+  allNodes.push({ ...picturesFolder });
+  picturesFiles.forEach(file => allNodes.push({ ...file }));
+  return picturesFolder;
 }
 
-function buildVideosFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildVideosFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const videosFiles: FileSystemNode[] = [
     createFile("homemade_movie_2026.mp4", 4_200_000_000, "", parentPath, new Date("2026-08-15")),
     createFile("kids_growing_up_compilation.mp4", 8_900_000_000, "", parentPath, new Date("2026-06-01")),
@@ -182,10 +191,13 @@ function buildVideosFolder(parentId: string, parentPath: string): FileSystemNode
     createFile("webinar_recording.mp4", 2_800_000_000, "", parentPath, new Date("2026-08-05")),
   ];
 
-  return createFolder("Videos", parentId, parentPath, videosFiles, new Date("2026-08-27"));
+  const videosFolder = createFolder("Videos", parentId, parentPath, videosFiles, new Date("2026-08-27"));
+  allNodes.push({ ...videosFolder });
+  videosFiles.forEach(file => allNodes.push({ ...file }));
+  return videosFolder;
 }
 
-function buildProjectsFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildProjectsFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const projectsFiles: FileSystemNode[] = [
     createFile("index.ts", 2_400, "", parentPath, new Date("2026-08-30")),
     createFile("package.json", 1_800, "", parentPath, new Date("2026-08-30")),
@@ -199,10 +211,13 @@ function buildProjectsFolder(parentId: string, parentPath: string): FileSystemNo
     createFile("docker-compose.yml", 1_200, "", parentPath, new Date("2026-08-15")),
   ];
 
-  return createFolder("Projects", parentId, parentPath, projectsFiles, new Date("2026-08-30"));
+  const projectsFolder = createFolder("Projects", parentId, parentPath, projectsFiles, new Date("2026-08-30"));
+  allNodes.push({ ...projectsFolder });
+  projectsFiles.forEach(file => allNodes.push({ ...file }));
+  return projectsFolder;
 }
 
-function buildMusicFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildMusicFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const musicFiles: FileSystemNode[] = [
     createFile("playlist_summer_2026.m3u", 2_400, "", parentPath, new Date("2026-06-01")),
     createFile("rock_classics.flac", 890_000_000, "", parentPath, new Date("2025-01-15")),
@@ -210,47 +225,42 @@ function buildMusicFolder(parentId: string, parentPath: string): FileSystemNode 
     createFile("podcasts_archive.zip", 4_500_000_000, "", parentPath, new Date("2026-01-10")),
   ];
 
-  return createFolder("Music", parentId, parentPath, musicFiles, new Date("2026-06-01"));
+  const musicFolder = createFolder("Music", parentId, parentPath, musicFiles, new Date("2026-06-01"));
+  allNodes.push({ ...musicFolder });
+  musicFiles.forEach(file => allNodes.push({ ...file }));
+  return musicFolder;
 }
 
-function buildDharmenderFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildDharmenderFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const dharmenderId = generateId();
   const dharmenderPath = `${parentPath}\\Dharmender`;
 
   const dharmenderChildren: FileSystemNode[] = [
-    buildDownloadsFolder(dharmenderId, dharmenderPath),
-    buildDocumentsFolder(dharmenderId, dharmenderPath),
-    buildPicturesFolder(dharmenderId, dharmenderPath),
-    buildVideosFolder(dharmenderId, dharmenderPath),
-    buildProjectsFolder(dharmenderId, dharmenderPath),
-    buildMusicFolder(dharmenderId, dharmenderPath),
+    buildDownloadsFolder(dharmenderId, dharmenderPath, allNodes),
+    buildDocumentsFolder(dharmenderId, dharmenderPath, allNodes),
+    buildPicturesFolder(dharmenderId, dharmenderPath, allNodes),
+    buildVideosFolder(dharmenderId, dharmenderPath, allNodes),
+    buildProjectsFolder(dharmenderId, dharmenderPath, allNodes),
+    buildMusicFolder(dharmenderId, dharmenderPath, allNodes),
   ];
 
-  // Set depth on all children
-  dharmenderChildren.forEach(child => {
-    setDepth(child, 1);
-  });
-
   const dharmenderFolder = createFolder("Dharmender", parentId, parentPath, dharmenderChildren, new Date("2026-08-28"));
+  allNodes.push({ ...dharmenderFolder });
   return dharmenderFolder;
 }
 
-function buildUsersFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildUsersFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const usersId = generateId();
   const usersPath = `${parentPath}\\Users`;
 
   const usersChildren: FileSystemNode[] = [
-    buildDharmenderFolder(usersId, usersPath),
+    buildDharmenderFolder(usersId, usersPath, allNodes),
   ];
-
-  usersChildren.forEach(child => {
-    setDepth(child, 1);
-  });
 
   return createFolder("Users", parentId, parentPath, usersChildren, new Date("2026-08-28"));
 }
 
-function buildProgramFilesFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildProgramFilesFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const programFiles: FileSystemNode[] = [
     createFile("Application.dll", 12_400_000, "", parentPath, new Date("2024-01-10")),
     createFile("Runtime.dll", 8_900_000, "", parentPath, new Date("2024-01-10")),
@@ -258,25 +268,23 @@ function buildProgramFilesFolder(parentId: string, parentPath: string): FileSyst
     createFile("Unins000.exe", 1_200_000, "", parentPath, new Date("2025-06-15")),
   ];
 
-  return createFolder("Program Files", parentId, parentPath, programFiles, new Date("2025-06-15"));
+  const programFilesFolder = createFolder("Program Files", parentId, parentPath, programFiles, new Date("2025-06-15"));
+  allNodes.push({ ...programFilesFolder });
+  programFiles.forEach(file => allNodes.push({ ...file }));
+  return programFilesFolder;
 }
 
-function buildWindowsFolder(parentId: string, parentPath: string): FileSystemNode {
+function buildWindowsFolder(parentId: string, parentPath: string, allNodes: FileSystemNode[]): FileSystemNode {
   const windowsFiles: FileSystemNode[] = [
     createFile("system32.dll", 45_600_000, "", parentPath, new Date("2024-06-15")),
     createFile("kernel32.dll", 12_400_000, "", parentPath, new Date("2024-06-15")),
     createFile("config.sys", 2_400, "", parentPath, new Date("2024-06-15")),
   ];
 
-  return createFolder("Windows", parentId, parentPath, windowsFiles, new Date("2024-06-15"));
-}
-
-// Recursively set depth on all nodes
-function setDepth(node: FileSystemNode, depth: number): void {
-  node.depth = depth;
-  if (node.childrenIds.length > 0) {
-    // Children already have their ids set, but we need to find them in the flat map
-  }
+  const windowsFolder = createFolder("Windows", parentId, parentPath, windowsFiles, new Date("2024-06-15"));
+  allNodes.push({ ...windowsFolder });
+  windowsFiles.forEach(file => allNodes.push({ ...file }));
+  return windowsFolder;
 }
 
 /**
@@ -292,68 +300,52 @@ export function buildMockFilesystem(): {
   const cRootId = generateId();
   const cRootPath = "C:\\";
 
+  // Array to collect all nodes during construction
+  const allNodes: FileSystemNode[] = [];
+
+  // Build Users folder and all subfolders/files
+  const usersFolder = buildUsersFolder(cRootId, cRootPath, allNodes);
+  // Build Windows folder and all subfolders/files
+  const windowsFolder = buildWindowsFolder(cRootId, cRootPath, allNodes);
+  // Build Program Files folder and all subfolders/files
+  const programFilesFolder = buildProgramFilesFolder(cRootId, cRootPath, allNodes);
+
+  // Create the root node with all children
   const cRootChildren: FileSystemNode[] = [
-    buildUsersFolder(cRootId, cRootPath),
-    buildWindowsFolder(cRootId, cRootPath),
-    buildProgramFilesFolder(cRootId, cRootPath),
+    usersFolder,
+    windowsFolder,
+    programFilesFolder,
   ];
 
-  cRootChildren.forEach(child => {
-    setDepth(child, 1);
-  });
+  // Set depth on all children using the nodes map we'll create
+  // We'll do this after we create the nodes map
 
   const cRoot = createFolder("C:\\", null as unknown as string, "", cRootChildren, new Date("2026-08-28"));
   cRoot.type = "drive";
+  allNodes.push({ ...cRoot });
 
-  // Flatten the tree into a map
-  function flattenNode(node: FileSystemNode, nodes: FileSystemNode[]) {
-    // Create a copy with depth set correctly
-    const nodeCopy = { ...node };
-    nodes.push(nodeCopy);
+  // Convert allNodes array to a map for efficient lookup
+  const nodesMap: Record<string, FileSystemNode> = {};
+  allNodes.forEach(node => {
+    nodesMap[node.id] = node;
+  });
 
-    // Find children in the flat structure and flatten them
-    for (const childId of node.childrenIds) {
-      const childNode = nodes.find(n => n.id === childId);
-      if (childNode) {
-        flattenNode(childNode, nodes);
-      }
-    }
-  }
-
-  // Collect all nodes
-  const allNodes: FileSystemNode[] = [];
-  flattenNode(cRoot, allNodes);
-
-  // Set depth recursively
-  function setNodeDepth(node: FileSystemNode, depth: number, nodes: Record<string, FileSystemNode>): void {
+  // Now set depths properly using the nodes map
+  function setDepthRecursive(node: FileSystemNode, depth: number): void {
     node.depth = depth;
     for (const childId of node.childrenIds) {
-      const child = nodes[childId];
-      if (child) {
-        setNodeDepth(child, depth + 1, nodes);
-      }
+     const child = nodesMap[childId];
+     if (child) {
+       setDepthRecursive(child, depth + 1);
+     }
     }
   }
 
-  // Build the flat map
-  const flatMap: Record<string, FileSystemNode> = {};
-  for (const node of allNodes) {
-    flatMap[node.id] = node;
-  }
-
-  // Set depths
-  setNodeDepth(cRoot, 0, flatMap);
-
-  // Recalculate childrenIds based on flat map
-  for (const node of Object.values(flatMap)) {
-    const parentId = node.parentId;
-    if (parentId && flatMap[parentId]) {
-      // Parent already has this child in childrenIds
-    }
-  }
+  // Set depth for all nodes starting from root (depth 0)
+  setDepthRecursive(cRoot, 0);
 
   return {
-    nodes: flatMap,
+    nodes: nodesMap,
     rootId: cRoot.id,
     root: cRoot,
   };

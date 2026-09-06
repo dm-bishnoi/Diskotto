@@ -3,6 +3,7 @@
 import * as React from "react";
 import { formatBytesShort, formatBytes } from "@/lib/utils";
 import { getCategoryColor } from "@/lib/file-utils";
+import { getLabelVisibility } from "@/lib/treemap-utils";
 import type { TreemapNode } from "@/types/filesystem";
 
 interface TreemapNodeRectProps {
@@ -39,20 +40,15 @@ export function TreemapNodeRect({
   const color = getCategoryColor(node.category as Parameters<typeof getCategoryColor>[0], theme);
   const textColor = theme === "dark" ? "#fafafa" : "#171717";
 
-  // Determine if label fits
-  const showLabel = width > 60 && height > 20;
-  const showFullLabel = width > 150 && height > 40;
-  const showSize = width > 80 && height > 30;
-
-  // Truncate name if needed
-  const maxNameChars = Math.floor((width - 8) / (theme === "dark" ? 7 : 7));
-  const displayName = node.name.length > maxNameChars
-    ? node.name.slice(0, maxNameChars - 1) + "…"
-    : node.name;
+  // Determine label visibility using area-aware logic
+  const labelInfo = getLabelVisibility(width, height, node.name);
+  const showLabel = labelInfo.showName;
+  const showSize = labelInfo.showSize;
+  const displayName = labelInfo.displayName;
 
   // Calculate text positions
-  const labelY = height > 30 ? height / 2 - (showSize ? 8 : 0) : height / 2 + 4;
-  const sizeY = height > 30 ? height / 2 + (showFullLabel ? 12 : 6) : height / 2 + 4;
+  const labelY = showSize ? height / 2 - 8 : height / 2;
+  const sizeY = height / 2 + 6;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {

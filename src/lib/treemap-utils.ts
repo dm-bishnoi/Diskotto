@@ -1,6 +1,17 @@
 import { hierarchy, treemap, type HierarchyRectangularNode } from "d3-hierarchy";
 import type { FileSystemNode, TreemapNode } from "@/types/filesystem";
-import { TREEMAP_AGGREGATION_THRESHOLD } from "./constants";
+import {
+  TREEMAP_AGGREGATION_THRESHOLD,
+  TREEMAP_LABEL_AREA_LARGE,
+  TREEMAP_LABEL_AREA_MEDIUM,
+  TREEMAP_LABEL_AREA_MIN,
+  TREEMAP_LABEL_MIN_WIDTH,
+  TREEMAP_LABEL_MIN_HEIGHT,
+  TREEMAP_LABEL_SIZE_MIN_WIDTH,
+  TREEMAP_LABEL_SIZE_MIN_HEIGHT,
+  TREEMAP_LABEL_CHAR_WIDTH,
+  TREEMAP_LABEL_PADDING,
+} from "./constants";
 
 type LayoutNode = HierarchyRectangularNode<TreemapNode>;
 
@@ -162,3 +173,91 @@ export function computeTreemapLayoutWithOverflow(
  * Type-safe wrapper for the D3 hierarchy node.
  */
 export type TreemapHierarchyNode = LayoutNode;
+
+/**
+ * Label visibility level for a treemap tile.
+ */
+export type LabelVisibility = "full" | "name" | "none";
+
+/**
+ * Result of label visibility analysis for a tile.
+ */
+export interface LabelVisibilityResult {
+  visibility: LabelVisibility;
+  showName: boolean;
+  showSize: boolean;
+  displayName: string;
+  maxNameChars: number;
+}
+
+/**
+ * Determine label visibility based on tile dimensions.
+ * Uses area-based thresholds to avoid rendering text in tiles that are too small.
+ *
+ * @param width - tile width in pixels
+ * @param height - tile height in pixels
+ * @param name - the file/folder name to potentially display
+ * @returns LabelVisibilityResult with visibility decisions and truncated name
+ */
+export function getLabelVisibility(
+  width: number,
+  height: number,
+  name: string
+): LabelVisibilityResult {
+  const area = width * height;
+
+  // Tiny tiles: no text at all
+  if (area < TREEMAP_LABEL_AREA_MIN || width < TREEMAP_LABEL_MIN_WIDTH || height < TREEMAP_LABEL_MIN_HEIGHT) {
+    return {
+      visibility: "none",
+      showName: false,
+      showSize: false,
+      displayName: "",
+      maxNameChars: 0,
+    };
+  }
+
+  // Calculate max characters that fit
+  const availableWidth = width - TREEMAP_LABEL_PADDING * 2;
+  const maxNameChars = Math.max(1, Math.floor(availableWidth / TREEMAP_LABEL_CHAR_WIDTH));
+
+  // Truncate name
+  const displayName = name.length > maxNameChars
+    ? name.slice(0, maxNameChars - 1) + "…"
+    : name;
+
+  // Large tiles: name + size
+  const canShowSize = area >= TREEMAP_LABEL_AREA_LARGE
+    && width >= TREEMAP_LABEL_SIZE_MIN_WIDTH
+    && height >= TREEMAP_LABEL_SIZE_MIN_HEIGHT;
+
+  if (area >= TREEMAP_LABEL_AREA_LARGE) {
+    return {
+      visibility: "full",
+      showName: true,
+      showSize: canShowSize,
+      displayName,
+      maxNameChars,
+    };
+  }
+
+  // Medium tiles: name only
+  if (area >= TREEMAP_LABEL_AREA_MEDIUM) {
+    return {
+      visibility: "name",
+      showName: true,
+      showSize: false,
+      displayName,
+      maxNameChars,
+    };
+  }
+
+  // Small tiles: no text
+  return {
+    visibility: "none",
+    showName: false,
+    showSize: false,
+    displayName: "",
+    maxNameChars: 0,
+  };
+}

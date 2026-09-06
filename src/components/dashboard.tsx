@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useDiskottoStore, useRootNode } from "@/store";
+import { useDiskottoStore, useRootNode, useCurrentNode } from "@/store";
 import { getMockData, computeExtensionStats, getLargestFiles, getLargestFolders } from "@/data/mock-data";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingState } from "@/components/states/loading-state";
@@ -25,8 +25,16 @@ import { useTheme } from "next-themes";
  */
 export function Dashboard() {
   const { resolvedTheme } = useTheme();
-  const { nodes, rootId, scanStatus, scanStats, detailsPanelOpen, setRootNode, addNodes, drillDown } = useDiskottoStore();
+  const nodes = useDiskottoStore((state) => state.nodes);
+  const rootId = useDiskottoStore((state) => state.rootId);
+  const scanStatus = useDiskottoStore((state) => state.scanStatus);
+  const scanStats = useDiskottoStore((state) => state.scanStats);
+  const detailsPanelOpen = useDiskottoStore((state) => state.detailsPanelOpen);
+  const setRootNode = useDiskottoStore((state) => state.setRootNode);
+  const addNodes = useDiskottoStore((state) => state.addNodes);
+  const drillDown = useDiskottoStore((state) => state.drillDown);
   const rootNode = useRootNode();
+  const currentNode = useCurrentNode();
   const [isLoading, setIsLoading] = React.useState(false);
 
   // Load mock data on mount
@@ -48,19 +56,30 @@ export function Dashboard() {
 
   // Compute analytics data
   const extensionStats = React.useMemo(
-    () => computeExtensionStats(nodes),
-    [nodes]
+    () => computeExtensionStats(nodes, currentNode),
+    [nodes, currentNode]
   );
 
   const largestFiles = React.useMemo(
-    () => getLargestFiles(nodes, 10),
-    [nodes]
+    () => getLargestFiles(nodes, 10, currentNode),
+    [nodes, currentNode]
   );
 
   const largestFolders = React.useMemo(
-    () => getLargestFolders(nodes, 5),
-    [nodes]
+    () => getLargestFolders(nodes, 5, currentNode),
+    [nodes, currentNode]
   );
+
+  // Debug: log store state
+  React.useEffect(() => {
+    console.log('Dashboard: nodes count', Object.keys(nodes).length);
+    console.log('Dashboard: rootId', rootId);
+    console.log('Dashboard: currentNode', currentNode);
+    if (currentNode) {
+      console.log('Dashboard: currentNode childrenIds length', currentNode.childrenIds.length);
+      console.log('Dashboard: currentNode childrenIds', currentNode.childrenIds);
+    }
+  }, [nodes, rootId, currentNode]);
 
   // Compute insights
   const insights = React.useMemo(() => {

@@ -59,7 +59,7 @@ export function Breadcrumb() {
           const isLast = index === pathNodes.length - 1;
           const isRoot = index === 0;
           return (
-            <React.Fragment key={node.id}>
+            <React.Fragment key={`${node.id}-${index}`}>
               {!isRoot && (
                 <ChevronRight
                   className="w-3.5 h-3.5 text-text-muted shrink-0"

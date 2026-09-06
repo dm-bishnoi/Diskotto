@@ -23,29 +23,31 @@ export function FolderTree() {
   } = useDiskottoStore();
 
   // Recursively render visible items based on expanded state
-  const visibleItems = React.useMemo(() => {
-    if (!rootId) return [];
-    const items: { node: FileSystemNode; depth: number; parentTotalSize: number }[] = [];
+      const visibleItems = React.useMemo(() => {
+        if (!rootId) return [];
+        const items: { node: FileSystemNode; depth: number; parentTotalSize: number }[] = [];
 
-    function walk(nodeId: string, depth: number, parentTotalSize: number) {
-      const node = nodes[nodeId];
-      if (!node) return;
+        function walk(nodeId: string, depth: number, parentTotalSize: number) {
+          const node = nodes[nodeId];
+          if (!node) return;
 
-      items.push({ node, depth, parentTotalSize });
+          console.log('FolderTree walk: nodeId=', nodeId, 'node=', node?.name, 'depth=', depth);
+          items.push({ node, depth, parentTotalSize });
 
-      if (expandedFolders.has(nodeId) && node.childrenIds.length > 0) {
-        for (const childId of node.childrenIds) {
-          const child = nodes[childId];
-          if (child) {
-            walk(childId, depth + 1, node.totalSize);
+          // If this is the root node or the node is expanded, then walk into children
+          if (nodeId === rootId || expandedFolders.has(nodeId)) {
+            for (const childId of node.childrenIds) {
+              const child = nodes[childId];
+              if (child) {
+                walk(childId, depth + 1, node.totalSize);
+              }
+            }
           }
         }
-      }
-    }
 
-    walk(rootId, 0, nodes[rootId]?.totalSize ?? 0);
-    return items;
-  }, [nodes, rootId, expandedFolders]);
+        walk(rootId, 0, nodes[rootId]?.totalSize ?? 0);
+        return items;
+      }, [nodes, rootId, expandedFolders]);
 
   if (!rootId) {
     return (
